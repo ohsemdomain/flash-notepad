@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- File: popup.html - Main extension popup interface -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Notepad</title>
+
+    <!-- JetBrains Mono Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Left Sidebar -->
+        <div class="sidebar">
+            <!-- Top: Title and Add Button -->
+            <div class="sidebar-header">
+                <h1 class="header-title">Notes</h1>
+                <button id="add-note-btn" class="icon-button" title="Add new note">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+
+            <!-- Middle: Notes List -->
+            <div id="notes-list" class="notes-list">
+                <!-- Notes will be inserted here by JavaScript -->
+            </div>
+
+            <!-- Bottom: Fixed Actions -->
+            <div class="sidebar-footer">
+                <button id="download-notes-btn" class="icon-button" title="Download all notes">
+                    <i class="fas fa-download"></i>
+                </button>
+                <button id="open-tab-btn" class="icon-button" title="Open in new tab">
+                    <i class="fas fa-external-link-alt"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Right Content Area -->
+        <div class="content-area">
+            <!-- Top: Note Title and Options -->
+            <div class="note-header">
+                <input id="note-title" class="note-title-input" placeholder="Untitled Note" value="Untitled Note">
+                <button id="note-options-btn" class="icon-button" title="More options">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+            </div>
+
+            <!-- Bottom: Note Content -->
+            <div class="note-content-container">
+                <textarea id="note-content" class="note-content" placeholder="Start typing..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+
+</html>
