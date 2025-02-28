@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Simple Notepad",
+  "name": "Flash Notepad",
   "version": "1.0",
-  "description": "A simple notepad extension with multiple notes support",
+  "description": "A simple and lightweight notepad extension with multiple notes support",
   "action": {
     "default_popup": "popup.html",
     "default_icon": {

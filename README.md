@@ -1,6 +1,6 @@
-# Simple Notepad Chrome Extension
+# Flash Notepad Chrome Extension
 
-This is a simple notepad Chrome extension that allows you to create and manage multiple notes with categories. It uses Chrome's local storage to persist data.
+This is a simple and lightweight notepad extension that allows you to create and manage multiple notes with categories. It uses Chrome's local storage to persist data.
 
 ## Installation
 
