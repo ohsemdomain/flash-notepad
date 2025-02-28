@@ -3,6 +3,7 @@
 import NotesModel from './model.js';
 import NotesView from './view.js';
 import NotesController from './controller.js';
+import CategoriesManager from './categories.js';
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', () => {

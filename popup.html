@@ -48,9 +48,19 @@
             <!-- Top: Note Title and Options -->
             <div class="note-header">
                 <input id="note-title" class="note-title-input" placeholder="Untitled Note" value="Untitled Note">
-                <button id="note-options-btn" class="icon-button" title="More options">
-                    <i class="fas fa-ellipsis-v"></i>
-                </button>
+                <div class="note-header-actions">
+                    <button id="add-category-btn" class="icon-button" title="Add category">
+                        <i class="fas fa-tag"></i>
+                    </button>
+                    <button id="note-options-btn" class="icon-button" title="More options">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Categories Container -->
+            <div id="categories-container" class="categories-container">
+                <!-- Categories will be inserted here by JavaScript -->
             </div>
 
             <!-- Bottom: Note Content -->

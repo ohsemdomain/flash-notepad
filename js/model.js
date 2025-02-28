@@ -22,6 +22,14 @@ class NotesModel {
         return new Promise((resolve) => {
             chrome.storage.local.get('notes', (result) => {
                 this.notes = result.notes || [];
+
+                // Ensure all notes have a categories array
+                this.notes.forEach(note => {
+                    if (!note.categories) {
+                        note.categories = [];
+                    }
+                });
+
                 resolve();
             });
         });
@@ -38,6 +46,7 @@ class NotesModel {
             id: Date.now().toString(),
             title: 'Untitled Note',
             content: '',
+            categories: [],
             createdAt: new Date().toISOString()
         };
 
@@ -69,6 +78,29 @@ class NotesModel {
                 this.activeNoteId = this.notes.length > 0 ? this.notes[0].id : null;
             }
 
+            this.saveNotes();
+        }
+    }
+
+    // Add a category to a note
+    addCategoryToNote(noteId, categoryId) {
+        const noteIndex = this.notes.findIndex(note => note.id === noteId);
+        if (noteIndex !== -1) {
+            // Only add if it doesn't already exist
+            if (!this.notes[noteIndex].categories.includes(categoryId)) {
+                this.notes[noteIndex].categories.push(categoryId);
+                this.saveNotes();
+            }
+        }
+    }
+
+    // Remove a category from a note
+    removeCategoryFromNote(noteId, categoryId) {
+        const noteIndex = this.notes.findIndex(note => note.id === noteId);
+        if (noteIndex !== -1) {
+            this.notes[noteIndex].categories = this.notes[noteIndex].categories.filter(
+                cat => cat !== categoryId
+            );
             this.saveNotes();
         }
     }
