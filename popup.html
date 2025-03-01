@@ -5,7 +5,7 @@
     <!-- File: popup.html - Main extension popup interface -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Notepad</title>
+    <title>Flash Notepad</title>
 
     <!-- JetBrains Mono Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -34,10 +34,10 @@
                 <!-- Notes will be inserted here by JavaScript -->
             </div>
 
-            <!-- Bottom: Fixed Actions -->
+            <!-- Bottom: Fixed Actions - Note: Changed download to settings -->
             <div class="sidebar-footer">
-                <button id="download-notes-btn" class="icon-button" title="Download all notes">
-                    <i class="fas fa-download"></i>
+                <button id="settings-btn" class="icon-button" title="Settings">
+                    <i class="fas fa-cog"></i>
                 </button>
                 <button id="open-tab-btn" class="icon-button" title="Open in new tab">
                     <i class="fas fa-external-link-alt"></i>
@@ -74,7 +74,7 @@
 
     <script type="module" src="js/app.js"></script>
 
-    <!-- Modal -->
+    <!-- Confirmation Modal -->
     <div id="modal-overlay" class="modal-overlay hidden">
         <div class="modal-container">
             <div class="modal-content">
@@ -83,6 +83,98 @@
                 <div class="modal-actions">
                     <button id="modal-cancel-btn" class="btn btn-secondary">Cancel</button>
                     <button id="modal-confirm-btn" class="btn btn-danger">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal (Added) -->
+    <div id="settings-modal" class="modal-overlay hidden">
+        <div class="modal-container settings-modal">
+            <div class="settings-header">
+                <h2>Settings</h2>
+                <button id="close-settings-btn" class="icon-button">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="settings-content">
+                <!-- Tabs -->
+                <div class="settings-tabs">
+                    <button class="settings-tab active" data-tab="backup">Backup & Import</button>
+                    <button class="settings-tab" data-tab="appearance">Appearance</button>
+                    <button class="settings-tab" data-tab="categories">Categories</button>
+                </div>
+
+                <!-- Tab Content -->
+                <div class="settings-tab-content">
+                    <!-- Backup & Import Tab -->
+                    <div class="tab-pane active" id="backup-tab">
+                        <h3>Backup Options</h3>
+                        <div class="setting-group">
+                            <button id="export-notes-btn" class="btn btn-primary">
+                                <i class="fas fa-download"></i> Export All Notes
+                            </button>
+                            <p class="setting-description">Export all notes as a JSON file</p>
+                        </div>
+
+                        <div class="setting-group">
+                            <button id="export-text-btn" class="btn btn-primary">
+                                <i class="fas fa-file-alt"></i> Export as Plain Text
+                            </button>
+                            <p class="setting-description">Export all notes as a single plain text file</p>
+                        </div>
+
+                        <h3>Import Options</h3>
+                        <div class="setting-group">
+                            <button id="import-notes-btn" class="btn btn-primary">
+                                <i class="fas fa-upload"></i> Import Notes
+                            </button>
+                            <p class="setting-description">Import notes from a JSON or text file</p>
+                            <input type="file" id="import-file-input" accept=".json,.txt" style="display: none;">
+                        </div>
+
+                        <div class="setting-group">
+                            <div class="checkbox-container">
+                                <input type="checkbox" id="merge-notes-option" checked>
+                                <label for="merge-notes-option">Merge with existing notes</label>
+                            </div>
+                            <p class="setting-description">When unchecked, imported notes will replace all existing
+                                notes</p>
+                        </div>
+                    </div>
+
+                    <!-- Appearance Tab (placeholder) -->
+                    <div class="tab-pane" id="appearance-tab">
+                        <h3>Theme</h3>
+                        <div class="setting-group">
+                            <select id="theme-selector" class="form-input">
+                                <option value="light">Light</option>
+                                <option value="dark">Dark</option>
+                                <option value="system">System Default</option>
+                            </select>
+                            <p class="setting-description">Choose the application theme</p>
+                        </div>
+
+                        <h3>Font Size</h3>
+                        <div class="setting-group">
+                            <select id="font-size" class="form-input">
+                                <option value="small">Small</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="large">Large</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Categories Tab (placeholder) -->
+                    <div class="tab-pane" id="categories-tab">
+                        <h3>Manage Categories</h3>
+                        <div id="categories-list" class="categories-list">
+                            <!-- Categories will be listed here -->
+                        </div>
+                        <button id="add-category-settings-btn" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Add New Category
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

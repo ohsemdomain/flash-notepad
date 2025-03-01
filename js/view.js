@@ -7,7 +7,7 @@ class NotesView {
         this.noteTitle = document.getElementById('note-title');
         this.noteContent = document.getElementById('note-content');
         this.addNoteBtn = document.getElementById('add-note-btn');
-        this.downloadNotesBtn = document.getElementById('download-notes-btn');
+        this.settingsBtn = document.getElementById('settings-btn'); // Changed from downloadNotesBtn
         this.openTabBtn = document.getElementById('open-tab-btn');
         this.noteOptionsBtn = document.getElementById('note-options-btn');
         this.categoriesContainer = document.getElementById('categories-container');
@@ -244,8 +244,6 @@ class NotesView {
         return dropdown;
     }
 
-    // Update these methods in the NotesView class
-
     showModal(title, message, onConfirm) {
         const modalOverlay = document.getElementById('modal-overlay');
         const modalContainer = modalOverlay.querySelector('.modal-container');
@@ -316,7 +314,6 @@ class NotesView {
             modalContainer.style.transform = 'translateY(0)';
         }, 200);
     }
-
 }
 
 export default NotesView;

@@ -76,8 +76,6 @@ class NotesController {
             }
         });
 
-        // In controller.js, update the setupEventListeners method
-
         // Add category button
         if (this.view.addCategoryBtn) {
             this.view.addCategoryBtn.addEventListener('click', async (e) => {
@@ -152,9 +150,9 @@ class NotesController {
             });
         }
 
-        // Download all notes
-        this.view.downloadNotesBtn.addEventListener('click', () => {
-            this.downloadNotes();
+        // Open settings - Replace download notes button with settings button
+        this.view.settingsBtn.addEventListener('click', () => {
+            this.openSettings();
         });
 
         // Open in new tab
@@ -190,6 +188,82 @@ class NotesController {
                 dropdown.remove();
             });
         });
+
+        // Settings modal event listeners
+        document.getElementById('close-settings-btn').addEventListener('click', () => {
+            document.getElementById('settings-modal').classList.add('hidden');
+        });
+
+        // Settings tabs
+        document.querySelectorAll('.settings-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Deactivate all tabs
+                document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+
+                // Activate clicked tab
+                tab.classList.add('active');
+                const tabId = `${tab.dataset.tab}-tab`;
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Export notes (JSON)
+        document.getElementById('export-notes-btn').addEventListener('click', () => {
+            this.exportNotes('json');
+        });
+
+        // Export notes (Plain Text)
+        document.getElementById('export-text-btn').addEventListener('click', () => {
+            this.exportNotes('text');
+        });
+
+        // Import notes
+        document.getElementById('import-notes-btn').addEventListener('click', () => {
+            document.getElementById('import-file-input').click();
+        });
+
+        // Handle file import
+        document.getElementById('import-file-input').addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+
+                reader.onload = async (event) => {
+                    const content = event.target.result;
+                    try {
+                        await this.importNotes(file, content);
+                        // Reset the file input
+                        e.target.value = '';
+                    } catch (error) {
+                        alert(`Error importing notes: ${error.message}`);
+                    }
+                };
+
+                if (file.name.endsWith('.json')) {
+                    reader.readAsText(file);
+                } else if (file.name.endsWith('.txt')) {
+                    reader.readAsText(file);
+                } else {
+                    alert('Please select a .json or .txt file');
+                }
+            }
+        });
+
+        // Category management in settings
+        document.getElementById('add-category-settings-btn').addEventListener('click', () => {
+            // Show create category form in settings
+            this.showCreateCategoryInSettings();
+        });
+    }
+
+    // Open settings modal
+    openSettings() {
+        // Populate categories list
+        this.renderCategoriesInSettings();
+
+        // Show settings modal
+        document.getElementById('settings-modal').classList.remove('hidden');
     }
 
     // Show form to create a new category
@@ -221,29 +295,253 @@ class NotesController {
         });
     }
 
-    // Show the categories manager modal
-    async showCategoriesManager() {
-        // This would be a more complex UI for managing all categories
-        // For now, we'll just show a simple alert
-        alert('Category management coming soon!');
+    // Show create category in settings panel
+    showCreateCategoryInSettings() {
+        // This would be implemented to show a form within the settings panel
+        alert('Add category functionality will be implemented here');
     }
 
-    downloadNotes() {
-        const notes = this.model.getAllNotes();
+    // Render categories in the settings panel
+    async renderCategoriesInSettings() {
+        const categoriesList = document.getElementById('categories-list');
+        categoriesList.innerHTML = '';
 
-        // Prepare data
-        const jsonData = JSON.stringify(notes, null, 2);
-        const blob = new Blob([jsonData], { type: 'application/json' });
+        const categories = await this.categoriesManager.getAllCategories();
+
+        if (categories.length === 0) {
+            categoriesList.innerHTML = '<div class="empty-state">No categories created yet</div>';
+            return;
+        }
+
+        categories.forEach(category => {
+            const categoryItem = document.createElement('div');
+            categoryItem.className = 'category-item';
+            categoryItem.innerHTML = `
+                <div class="category-color" style="background-color: ${category.color}"></div>
+                <div class="category-name">${category.name}</div>
+                <div class="category-actions">
+                    <button class="icon-button edit-category" data-id="${category.id}">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="icon-button delete-category" data-id="${category.id}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+            categoriesList.appendChild(categoryItem);
+        });
+
+        // Add event listeners for edit and delete actions
+        categoriesList.querySelectorAll('.edit-category').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const categoryId = e.currentTarget.dataset.id;
+                // Edit category functionality would go here
+                alert(`Edit category ${categoryId}`);
+            });
+        });
+
+        categoriesList.querySelectorAll('.delete-category').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const categoryId = e.currentTarget.dataset.id;
+                // Delete category functionality would go here
+                alert(`Delete category ${categoryId}`);
+            });
+        });
+    }
+
+    // Export notes as JSON or text
+    exportNotes(format = 'json') {
+        const notes = this.model.getAllNotes();
+        let fileContent;
+        let fileName;
+        let mimeType;
+
+        if (format === 'json') {
+            // Export as JSON (current format)
+            fileContent = JSON.stringify(notes, null, 2);
+            fileName = `flash-notepad-${new Date().toISOString().split('T')[0]}.json`;
+            mimeType = 'application/json';
+        } else {
+            // Export as plain text
+            fileContent = this.convertNotesToPlainText(notes);
+            fileName = `flash-notepad-${new Date().toISOString().split('T')[0]}.txt`;
+            mimeType = 'text/plain';
+        }
+
+        const blob = new Blob([fileContent], { type: mimeType });
         const url = URL.createObjectURL(blob);
 
         // Create download link
         const a = document.createElement('a');
         a.href = url;
-        a.download = `notes-${new Date().toISOString().split('T')[0]}.json`;
+        a.download = fileName;
         a.click();
 
         // Clean up
         URL.revokeObjectURL(url);
+    }
+
+    // Convert notes to plain text format
+    convertNotesToPlainText(notes) {
+        let textContent = `FLASH NOTEPAD BACKUP - ${new Date().toISOString()}\n\n`;
+
+        notes.forEach(note => {
+            textContent += '--- NOTE START ---\n';
+            textContent += `ID: ${note.id}\n`;
+            textContent += `TITLE: ${note.title}\n`;
+            textContent += `CREATED: ${note.createdAt}\n`;
+
+            if (note.categories && note.categories.length > 0) {
+                const categoryNames = note.categories.map(catId => {
+                    const category = this.categoriesMap.get(catId);
+                    return category ? category.name : catId;
+                });
+                textContent += `CATEGORIES: ${categoryNames.join(', ')}\n`;
+            } else {
+                textContent += 'CATEGORIES: \n';
+            }
+
+            textContent += 'CONTENT:\n';
+            textContent += `${note.content}\n`;
+            textContent += '--- NOTE END ---\n\n';
+        });
+
+        return textContent;
+    }
+
+    // Import notes from file
+    async importNotes(file, content) {
+        const mergeNotes = document.getElementById('merge-notes-option').checked;
+
+        if (file.name.endsWith('.json')) {
+            try {
+                const notes = JSON.parse(content);
+
+                if (!Array.isArray(notes)) {
+                    throw new Error('Invalid notes format');
+                }
+
+                if (!mergeNotes) {
+                    // Delete all existing notes
+                    const existingNotes = this.model.getAllNotes();
+                    for (const note of existingNotes) {
+                        await this.model.deleteNote(note.id);
+                    }
+                }
+
+                // Import each note
+                for (const note of notes) {
+                    // Check if the note has required fields
+                    if (!note.title || !note.content) continue;
+
+                    if (mergeNotes) {
+                        // Check if a note with the same ID exists
+                        const existingNote = this.model.getAllNotes().find(n => n.id === note.id);
+                        if (existingNote) {
+                            await this.model.updateNote(note.id, note);
+                        } else {
+                            // Create a new note with the imported data
+                            const newNote = await this.model.createNote();
+                            await this.model.updateNote(newNote.id, {
+                                title: note.title,
+                                content: note.content,
+                                categories: note.categories || []
+                            });
+                        }
+                    } else {
+                        // Create a new note with the imported data
+                        const newNote = await this.model.createNote();
+                        await this.model.updateNote(newNote.id, {
+                            title: note.title,
+                            content: note.content,
+                            categories: note.categories || []
+                        });
+                    }
+                }
+
+                this.refreshView();
+                alert(`Successfully imported ${notes.length} notes.`);
+
+            } catch (error) {
+                throw new Error(`Failed to parse JSON: ${error.message}`);
+            }
+        } else if (file.name.endsWith('.txt')) {
+            try {
+                const notes = this.parseTextNotes(content);
+
+                if (!mergeNotes) {
+                    // Delete all existing notes
+                    const existingNotes = this.model.getAllNotes();
+                    for (const note of existingNotes) {
+                        await this.model.deleteNote(note.id);
+                    }
+                }
+
+                // Import each note
+                for (const note of notes) {
+                    // Check if the note has required fields
+                    if (!note.title || !note.content) continue;
+
+                    // Create a new note with the imported data
+                    const newNote = await this.model.createNote();
+                    await this.model.updateNote(newNote.id, {
+                        title: note.title,
+                        content: note.content,
+                        // Categories would need to be resolved by name
+                        categories: []
+                    });
+                }
+
+                this.refreshView();
+                alert(`Successfully imported ${notes.length} notes.`);
+
+            } catch (error) {
+                throw new Error(`Failed to parse text file: ${error.message}`);
+            }
+        } else {
+            throw new Error('Unsupported file format');
+        }
+    }
+
+    // Parse plain text notes
+    parseTextNotes(content) {
+        const notes = [];
+        const noteBlocks = content.split('--- NOTE START ---');
+
+        for (let i = 1; i < noteBlocks.length; i++) { // Start from 1 to skip header
+            const block = noteBlocks[i].split('--- NOTE END ---')[0];
+
+            // Parse note properties
+            const idMatch = block.match(/ID: (.+)/);
+            const titleMatch = block.match(/TITLE: (.+)/);
+            const contentMatch = block.match(/CONTENT:\s([\s\S]*?)(?=--- NOTE END|$)/);
+
+            if (titleMatch && contentMatch) {
+                notes.push({
+                    id: idMatch ? idMatch[1].trim() : Date.now().toString(),
+                    title: titleMatch[1].trim(),
+                    content: contentMatch[1].trim(),
+                    // We'll handle categories separately
+                    categories: []
+                });
+            }
+        }
+
+        return notes;
+    }
+
+    // Show the categories manager modal
+    async showCategoriesManager() {
+        // This would be a more complex UI for managing all categories
+        // Now we can just open the settings panel to the categories tab
+        this.openSettings();
+
+        // Activate the categories tab
+        document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+
+        document.querySelector('.settings-tab[data-tab="categories"]').classList.add('active');
+        document.getElementById('categories-tab').classList.add('active');
     }
 }
 
