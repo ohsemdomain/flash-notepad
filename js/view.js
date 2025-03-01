@@ -18,6 +18,14 @@ class NotesView {
     renderNotesList(notes, activeNoteId, categoriesMap) {
         this.notesList.innerHTML = '';
 
+        if (notes.length === 0) {
+            const emptyState = document.createElement('div');
+            emptyState.className = 'empty-state';
+            emptyState.textContent = 'No notes yet. Click + to create one.';
+            this.notesList.appendChild(emptyState);
+            return;
+        }
+
         notes.forEach(note => {
             const noteItem = document.createElement('div');
             noteItem.className = `note-item ${note.id === activeNoteId ? 'active' : ''}`;
@@ -26,7 +34,7 @@ class NotesView {
             // Create title element
             const titleElement = document.createElement('div');
             titleElement.className = 'note-item-title';
-            titleElement.textContent = note.title;
+            titleElement.textContent = note.title || 'Untitled Note';
 
             // Create categories container
             const categoriesElement = document.createElement('div');
@@ -57,11 +65,34 @@ class NotesView {
     // Render the active note
     renderActiveNote(note) {
         if (note) {
-            this.noteTitle.value = note.title;
-            this.noteContent.value = note.content;
+            this.noteTitle.value = note.title || '';
+            this.noteContent.value = note.content || '';
+
+            // Enable edit controls
+            this.noteTitle.disabled = false;
+            this.noteContent.disabled = false;
+            this.addCategoryBtn.disabled = false;
+            this.noteOptionsBtn.disabled = false;
+
+            // Make sure options button is visible
+            this.noteOptionsBtn.style.visibility = 'visible';
         } else {
             this.noteTitle.value = '';
             this.noteContent.value = '';
+
+            // Disable edit controls when no note is selected
+            this.noteTitle.disabled = true;
+            this.noteContent.disabled = true;
+            this.addCategoryBtn.disabled = true;
+            this.noteOptionsBtn.disabled = true;
+
+            // Hide options button
+            this.noteOptionsBtn.style.visibility = 'hidden';
+
+            // Clear categories
+            if (this.categoriesContainer) {
+                this.categoriesContainer.innerHTML = '';
+            }
         }
     }
 
@@ -120,22 +151,29 @@ class NotesView {
         dropdown.style.overflowY = 'auto';
 
         // Add existing categories
-        categories.forEach(category => {
-            const item = document.createElement('div');
-            item.className = 'dropdown-item category-option';
-            item.dataset.id = category.id;
+        if (categories.length === 0) {
+            const emptyState = document.createElement('div');
+            emptyState.className = 'dropdown-item empty-state';
+            emptyState.textContent = 'No categories yet';
+            dropdown.appendChild(emptyState);
+        } else {
+            categories.forEach(category => {
+                const item = document.createElement('div');
+                item.className = 'dropdown-item category-option';
+                item.dataset.id = category.id;
 
-            const colorSwatch = document.createElement('span');
-            colorSwatch.className = 'category-color-swatch';
-            colorSwatch.style.backgroundColor = category.color;
+                const colorSwatch = document.createElement('span');
+                colorSwatch.className = 'category-color-swatch';
+                colorSwatch.style.backgroundColor = category.color;
 
-            const nameSpan = document.createElement('span');
-            nameSpan.textContent = category.name;
+                const nameSpan = document.createElement('span');
+                nameSpan.textContent = category.name;
 
-            item.appendChild(colorSwatch);
-            item.appendChild(nameSpan);
-            dropdown.appendChild(item);
-        });
+                item.appendChild(colorSwatch);
+                item.appendChild(nameSpan);
+                dropdown.appendChild(item);
+            });
+        }
 
         // Add separator
         const separator = document.createElement('div');
@@ -224,10 +262,10 @@ class NotesView {
         // Add dropdown items
         dropdown.innerHTML = `
         <div id="manage-categories" class="dropdown-item">
-          Manage categories
+          <i class="fas fa-tags"></i> Manage categories
         </div>
-        <div id="delete-note" class="dropdown-item">
-          Delete note
+        <div id="delete-note" class="dropdown-item text-danger">
+          <i class="fas fa-trash"></i> Delete note
         </div>
       `;
 

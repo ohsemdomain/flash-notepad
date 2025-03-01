@@ -146,6 +146,11 @@ body {
     background-color: var(--color-highlight);
 }
 
+.icon-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
     width: 6px;
@@ -176,13 +181,18 @@ body {
 .dropdown-item {
     padding: 8px 16px;
     cursor: pointer;
+    transition: background-color 0.2s;
 }
 
 .dropdown-item:hover {
     background-color: var(--color-highlight);
 }
 
-/* Add these styles to your existing styles.css file */
+.dropdown-item i {
+    margin-right: 8px;
+    width: 16px;
+    text-align: center;
+}
 
 /* Note header actions container */
 .note-header-actions {
@@ -272,6 +282,7 @@ body {
     margin-bottom: 4px;
     font-size: 12px;
     color: var(--color-text-light);
+    user-select: none;
 }
 
 .form-input {
@@ -280,6 +291,12 @@ body {
     border: 1px solid var(--color-border);
     border-radius: 4px;
     font-family: var(--font-family);
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #4285F4;
+    box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
 }
 
 .color-picker {
@@ -300,6 +317,11 @@ body {
     cursor: pointer;
     font-family: var(--font-family);
     font-size: 12px;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn:active {
+    transform: translateY(1px);
 }
 
 .btn-primary {
@@ -307,9 +329,26 @@ body {
     color: white;
 }
 
+.btn-primary:hover {
+    background-color: #3b78e7;
+}
+
 .btn-secondary {
     background-color: var(--color-highlight);
     color: var(--color-text);
+}
+
+.btn-secondary:hover {
+    background-color: #e0e0e0;
+}
+
+.btn-danger {
+    background-color: #e53935;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #d32f2f;
 }
 
 /* Modal Styles */
@@ -375,24 +414,6 @@ body {
     border-radius: 6px;
     font-weight: 500;
     transition: all 0.2s ease;
-}
-
-.btn-danger {
-    background-color: #e53935;
-    color: white;
-}
-
-.btn-danger:hover {
-    background-color: #c62828;
-}
-
-.btn-secondary {
-    background-color: #f5f5f5;
-    color: var(--color-text);
-}
-
-.btn-secondary:hover {
-    background-color: #e0e0e0;
 }
 
 /* Settings Modal Styles */
@@ -493,10 +514,16 @@ body {
     align-items: center;
     padding: 8px 12px;
     border-bottom: 1px solid var(--color-border);
+    position: relative;
+    transition: background-color 0.2s;
 }
 
 .category-item:last-child {
     border-bottom: none;
+}
+
+.category-item:hover {
+    background-color: var(--color-highlight);
 }
 
 .category-color {
@@ -513,4 +540,66 @@ body {
 .category-actions {
     display: flex;
     gap: 8px;
+    opacity: 0.2;
+    transition: opacity 0.2s;
+}
+
+.category-item:hover .category-actions {
+    opacity: 1;
+}
+
+/* Empty state style */
+.empty-state {
+    padding: 10px;
+    text-align: center;
+    color: var(--color-text-light);
+    font-style: italic;
+}
+
+/* Text danger class for delete buttons */
+.text-danger {
+    color: #e53935;
+}
+
+/* Notification System */
+.notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    border-radius: 4px;
+    color: white;
+    font-weight: 500;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    max-width: 300px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.notification.show {
+    opacity: 1;
+}
+
+.notification.info {
+    background-color: #4285F4;
+}
+
+.notification.success {
+    background-color: #34A853;
+}
+
+.notification.error {
+    background-color: #EA4335;
+}
+
+.notification.warning {
+    background-color: #FBBC05;
+}
+
+/* Notes count in categories list */
+.notes-count {
+    font-size: 11px;
+    color: var(--color-text-light);
+    margin-left: 8px;
 }

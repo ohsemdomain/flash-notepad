@@ -41,8 +41,23 @@ class CategoriesManager {
 
     // Create a new category
     async createCategory(name, color) {
+        // Validate inputs
+        if (!name || !color) {
+            throw new Error('Category name and color are required');
+        }
+
+        // Check if a category with the same name already exists
+        const existingCategory = await db.categories
+            .where('name')
+            .equalsIgnoreCase(name)
+            .first();
+
+        if (existingCategory) {
+            throw new Error(`A category named "${name}" already exists`);
+        }
+
         const newCategory = {
-            id: name.toLowerCase().replace(/\s+/g, '-'),
+            id: name.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now(),
             name,
             color
         };
@@ -53,29 +68,86 @@ class CategoriesManager {
             return newCategory;
         } catch (error) {
             console.error('Error creating category:', error);
-            return null;
+            throw new Error('Failed to create category: ' + error.message);
         }
     }
 
-    // Delete a category
+    // Update an existing category
+    async updateCategory(categoryId, updates) {
+        // Validate inputs
+        if (!categoryId) {
+            throw new Error('Category ID is required');
+        }
+
+        if (!updates || (!updates.name && !updates.color)) {
+            throw new Error('At least one update field (name or color) is required');
+        }
+
+        try {
+            // Check if category exists
+            const category = await db.categories.get(categoryId);
+            if (!category) {
+                throw new Error(`Category with ID "${categoryId}" not found`);
+            }
+
+            // If name is being updated, check for duplicates
+            if (updates.name && updates.name !== category.name) {
+                const existingCategory = await db.categories
+                    .where('name')
+                    .equalsIgnoreCase(updates.name)
+                    .first();
+
+                if (existingCategory && existingCategory.id !== categoryId) {
+                    throw new Error(`A category named "${updates.name}" already exists`);
+                }
+            }
+
+            // Update in database
+            await db.categories.update(categoryId, updates);
+
+            // Return the updated category
+            return await db.categories.get(categoryId);
+        } catch (error) {
+            console.error('Error updating category:', error);
+            throw new Error('Failed to update category: ' + error.message);
+        }
+    }
+
+    // Delete a category and remove it from all notes
     async deleteCategory(categoryId) {
         try {
-            // Delete from database
-            await db.categories.delete(categoryId);
+            // Check if category exists
+            const category = await db.categories.get(categoryId);
+            if (!category) {
+                throw new Error(`Category with ID "${categoryId}" not found`);
+            }
 
-            // Also update all notes that have this category
+            // Get all notes with this category
             const notesWithCategory = await db.notes
                 .where('categories')
                 .equals(categoryId)
                 .toArray();
 
-            // Remove the category from each note
-            for (const note of notesWithCategory) {
-                note.categories = note.categories.filter(cat => cat !== categoryId);
-                await db.notes.update(note.id, { categories: note.categories });
-            }
+            // Start a transaction to ensure atomicity
+            await db.transaction('rw', [db.categories, db.notes], async () => {
+                // Delete the category
+                await db.categories.delete(categoryId);
+
+                // Remove the category from all notes
+                for (const note of notesWithCategory) {
+                    note.categories = note.categories.filter(cat => cat !== categoryId);
+                    await db.notes.update(note.id, { categories: note.categories });
+                }
+            });
+
+            return {
+                success: true,
+                message: `Category "${category.name}" deleted successfully`,
+                affectedNotes: notesWithCategory.length
+            };
         } catch (error) {
             console.error('Error deleting category:', error);
+            throw new Error('Failed to delete category: ' + error.message);
         }
     }
 
@@ -94,12 +166,29 @@ class CategoriesManager {
         }
     }
 
-    // Update a category
-    async updateCategory(categoryId, updates) {
+    // Get category by name (case insensitive)
+    async getCategoryByName(name) {
         try {
-            await db.categories.update(categoryId, updates);
+            return await db.categories
+                .where('name')
+                .equalsIgnoreCase(name)
+                .first();
         } catch (error) {
-            console.error('Error updating category:', error);
+            console.error('Error getting category by name:', error);
+            return null;
+        }
+    }
+
+    // Get notes count for a category
+    async getNotesCountForCategory(categoryId) {
+        try {
+            return await db.notes
+                .where('categories')
+                .equals(categoryId)
+                .count();
+        } catch (error) {
+            console.error('Error counting notes for category:', error);
+            return 0;
         }
     }
 }

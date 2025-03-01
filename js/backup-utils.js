@@ -44,6 +44,24 @@ export function convertNotesToPlainText(notes, categoriesMap) {
 export function parseTextNotes(content, existingCategories) {
     const notes = [];
     const noteBlocks = content.split('--- NOTE START ---');
+    const categoryCache = {}; // For tracking created categories during import
+
+    // Helper function to find or create a category
+    const findOrCreateCategory = (name, color = '#4285F4') => {
+        // First check cache
+        if (categoryCache[name]) return categoryCache[name];
+
+        // Then check existing categories
+        const existingCat = existingCategories.find(c => c.name.toLowerCase() === name.toLowerCase());
+        if (existingCat) {
+            categoryCache[name] = existingCat.id;
+            return existingCat.id;
+        }
+
+        // Not found - this would require creating a new category
+        // This would be handled separately during the import process
+        return null;
+    };
 
     for (let i = 1; i < noteBlocks.length; i++) { // Start from 1 to skip header
         const block = noteBlocks[i].split('--- NOTE END ---')[0];
@@ -66,19 +84,15 @@ export function parseTextNotes(content, existingCategories) {
                     // Check if category has color information
                     if (catStr.includes(':')) {
                         const [name, color] = catStr.split(':');
-                        // Look for existing category with this name
-                        const existingCat = existingCategories.find(c => c.name === name);
-                        if (existingCat) {
-                            parsedCategories.push(existingCat.id);
-                        } else {
-                            // Category doesn't exist yet - it would be created later
-                            // This requires category creation logic in the import process
+                        const categoryId = findOrCreateCategory(name, color);
+                        if (categoryId) {
+                            parsedCategories.push(categoryId);
                         }
                     } else {
                         // Simple category name - try to find by name
-                        const existingCat = existingCategories.find(c => c.name === catStr);
-                        if (existingCat) {
-                            parsedCategories.push(existingCat.id);
+                        const categoryId = findOrCreateCategory(catStr);
+                        if (categoryId) {
+                            parsedCategories.push(categoryId);
                         }
                     }
                 });
