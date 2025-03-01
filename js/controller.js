@@ -208,11 +208,6 @@ class NotesController {
             });
         });
 
-        // Export notes (JSON)
-        document.getElementById('export-notes-btn').addEventListener('click', () => {
-            this.exportNotes('json');
-        });
-
         // Export notes (Plain Text)
         document.getElementById('export-text-btn').addEventListener('click', () => {
             this.exportNotes('text');
@@ -240,12 +235,10 @@ class NotesController {
                     }
                 };
 
-                if (file.name.endsWith('.json')) {
-                    reader.readAsText(file);
-                } else if (file.name.endsWith('.txt')) {
+                if (file.name.endsWith('.txt')) {
                     reader.readAsText(file);
                 } else {
-                    alert('Please select a .json or .txt file');
+                    alert('Please select a .txt file');
                 }
             }
         });
@@ -349,24 +342,17 @@ class NotesController {
         });
     }
 
-    // Export notes as JSON or text
-    exportNotes(format = 'json') {
+    // Export notes as text
+    exportNotes(format = 'text') {
         const notes = this.model.getAllNotes();
         let fileContent;
         let fileName;
         let mimeType;
 
-        if (format === 'json') {
-            // Export as JSON (current format)
-            fileContent = JSON.stringify(notes, null, 2);
-            fileName = `flash-notepad-${new Date().toISOString().split('T')[0]}.json`;
-            mimeType = 'application/json';
-        } else {
-            // Export as plain text
-            fileContent = this.convertNotesToPlainText(notes);
-            fileName = `flash-notepad-${new Date().toISOString().split('T')[0]}.txt`;
-            mimeType = 'text/plain';
-        }
+        // Export as plain text
+        fileContent = this.convertNotesToPlainText(notes);
+        fileName = `flash-notepad-${new Date().toISOString().split('T')[0]}.txt`;
+        mimeType = 'text/plain';
 
         const blob = new Blob([fileContent], { type: mimeType });
         const url = URL.createObjectURL(blob);
@@ -411,70 +397,14 @@ class NotesController {
 
     // Import notes from file
     async importNotes(file, content) {
-        const mergeNotes = document.getElementById('merge-notes-option').checked;
-
-        if (file.name.endsWith('.json')) {
-            try {
-                const notes = JSON.parse(content);
-
-                if (!Array.isArray(notes)) {
-                    throw new Error('Invalid notes format');
-                }
-
-                if (!mergeNotes) {
-                    // Delete all existing notes
-                    const existingNotes = this.model.getAllNotes();
-                    for (const note of existingNotes) {
-                        await this.model.deleteNote(note.id);
-                    }
-                }
-
-                // Import each note
-                for (const note of notes) {
-                    // Check if the note has required fields
-                    if (!note.title || !note.content) continue;
-
-                    if (mergeNotes) {
-                        // Check if a note with the same ID exists
-                        const existingNote = this.model.getAllNotes().find(n => n.id === note.id);
-                        if (existingNote) {
-                            await this.model.updateNote(note.id, note);
-                        } else {
-                            // Create a new note with the imported data
-                            const newNote = await this.model.createNote();
-                            await this.model.updateNote(newNote.id, {
-                                title: note.title,
-                                content: note.content,
-                                categories: note.categories || []
-                            });
-                        }
-                    } else {
-                        // Create a new note with the imported data
-                        const newNote = await this.model.createNote();
-                        await this.model.updateNote(newNote.id, {
-                            title: note.title,
-                            content: note.content,
-                            categories: note.categories || []
-                        });
-                    }
-                }
-
-                this.refreshView();
-                alert(`Successfully imported ${notes.length} notes.`);
-
-            } catch (error) {
-                throw new Error(`Failed to parse JSON: ${error.message}`);
-            }
-        } else if (file.name.endsWith('.txt')) {
+        if (file.name.endsWith('.txt')) {
             try {
                 const notes = this.parseTextNotes(content);
 
-                if (!mergeNotes) {
-                    // Delete all existing notes
-                    const existingNotes = this.model.getAllNotes();
-                    for (const note of existingNotes) {
-                        await this.model.deleteNote(note.id);
-                    }
+                // Delete all existing notes
+                const existingNotes = this.model.getAllNotes();
+                for (const note of existingNotes) {
+                    await this.model.deleteNote(note.id);
                 }
 
                 // Import each note

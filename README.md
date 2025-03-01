@@ -24,10 +24,8 @@ This is a simple notepad Chrome extension that allows you to create and manage m
 -   **Opening in a new tab:** Click the external link icon in the sidebar to open the notepad in a new tab.
 - **Settings:** Click the cog icon in the sidebar to open the settings modal.
     - **Backup & Import:**
-        - **Export All Notes:** Downloads all notes as a JSON file.
         - **Export as Plain Text:** Downloads all notes as a single plain text file.
-        - **Import Notes:** Opens a file dialog to select a JSON or TXT file to import.
-        - **Merge with existing notes:** Checkbox to control whether imported notes should be merged with existing notes or replace them.
+        - **Import Notes:** Opens a file dialog to select a TXT file to import. Note that importing will replace all existing notes.
     - **Appearance:** (Placeholder)
         - **Theme:** Select between light, dark, or system default theme.
         - **Font Size:** Select between small, medium, or large font size.
@@ -48,7 +46,8 @@ This is a simple notepad Chrome extension that allows you to create and manage m
     -   Global styles (font, colors, etc.)
     -   App container, sidebar, content area
     -   Notes list, note items, note header
-    -   Buttons, custom scrollbar
+    -   Buttons
+    -   Custom scrollbar
     -   Dropdown menus
     -   Category badges, categories container
     -   Form elements (input, select, checkbox)
@@ -59,8 +58,8 @@ This is a simple notepad Chrome extension that allows you to create and manage m
 -   `js/controller.js`: Controller logic, connecting the Model and View. It handles user interactions, such as adding, selecting, updating, and deleting notes. It also includes functionality for:
     -   Managing categories (adding, removing, creating, and displaying).
     -   Opening the settings modal.
-    -   Exporting notes as JSON or plain text.
-    -   Importing notes from JSON or plain text files.
+    -   Exporting notes as plain text.
+    -   Importing notes from plain text files.
     -   Displaying confirmation modals.
 -   `js/model.js`: Data model, responsible for managing the notes data. It uses Dexie.js (`db.js`) for database operations. It handles:
     -   Loading and saving notes to the database.
@@ -80,3 +79,7 @@ This is a simple notepad Chrome extension that allows you to create and manage m
 - `js/db.js`: Sets up the Dexie.js database (using `lib/dexie.js`). Defines the database schema, including tables for notes and categories, and initializes default categories.
 - `js/backup-utils.js`: Provides utility functions for converting notes to and from a plain text format for backup and import purposes.
 - `lib/dexie.js`: The Dexie.js library file.
+Last edited just now
+
+
+

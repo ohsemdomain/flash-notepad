@@ -111,13 +111,6 @@
                     <div class="tab-pane active" id="backup-tab">
                         <h3>Backup Options</h3>
                         <div class="setting-group">
-                            <button id="export-notes-btn" class="btn btn-primary">
-                                <i class="fas fa-download"></i> Export All Notes
-                            </button>
-                            <p class="setting-description">Export all notes as a JSON file</p>
-                        </div>
-
-                        <div class="setting-group">
                             <button id="export-text-btn" class="btn btn-primary">
                                 <i class="fas fa-file-alt"></i> Export as Plain Text
                             </button>
@@ -129,17 +122,9 @@
                             <button id="import-notes-btn" class="btn btn-primary">
                                 <i class="fas fa-upload"></i> Import Notes
                             </button>
-                            <p class="setting-description">Import notes from a JSON or text file</p>
-                            <input type="file" id="import-file-input" accept=".json,.txt" style="display: none;">
-                        </div>
-
-                        <div class="setting-group">
-                            <div class="checkbox-container">
-                                <input type="checkbox" id="merge-notes-option" checked>
-                                <label for="merge-notes-option">Merge with existing notes</label>
-                            </div>
-                            <p class="setting-description">When unchecked, imported notes will replace all existing
-                                notes</p>
+                            <p class="setting-description">Import notes from a text file (replaces all existing notes)
+                            </p>
+                            <input type="file" id="import-file-input" accept=".txt" style="display: none;">
                         </div>
                     </div>
 

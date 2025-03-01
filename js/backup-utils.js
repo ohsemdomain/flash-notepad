@@ -96,22 +96,3 @@ export function parseTextNotes(content, existingCategories) {
 
     return notes;
 }
-
-/**
- * Check if a JSON file has the expected notes format
- * 
- * @param {Array} data JSON data to validate
- * @returns {boolean} True if valid format
- */
-export function validateNotesFormat(data) {
-    if (!Array.isArray(data)) return false;
-
-    // Check at least one note has expected properties
-    if (data.length === 0) return true;
-
-    const requiredProps = ['title', 'content'];
-
-    // Check if at least first note has the required properties
-    const firstNote = data[0];
-    return requiredProps.every(prop => firstNote.hasOwnProperty(prop));
-}
