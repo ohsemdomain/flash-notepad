@@ -243,6 +243,80 @@ class NotesView {
 
         return dropdown;
     }
+
+    // Update these methods in the NotesView class
+
+    showModal(title, message, onConfirm) {
+        const modalOverlay = document.getElementById('modal-overlay');
+        const modalContainer = modalOverlay.querySelector('.modal-container');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMessage = document.getElementById('modal-message');
+        const confirmBtn = document.getElementById('modal-confirm-btn');
+        const cancelBtn = document.getElementById('modal-cancel-btn');
+
+        // Set content
+        modalTitle.textContent = title || 'Confirm Action';
+        modalMessage.textContent = message || 'Are you sure you want to proceed?';
+
+        // Show modal with animation
+        modalOverlay.classList.remove('hidden');
+
+        // Add entrance animation
+        modalContainer.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            modalContainer.style.transform = 'translateY(0)';
+        }, 10);
+
+        // Setup event listeners
+        const handleConfirm = () => {
+            this.hideModal();
+            onConfirm();
+            confirmBtn.removeEventListener('click', handleConfirm);
+            cancelBtn.removeEventListener('click', handleCancel);
+        };
+
+        const handleCancel = () => {
+            this.hideModal();
+            confirmBtn.removeEventListener('click', handleConfirm);
+            cancelBtn.removeEventListener('click', handleCancel);
+        };
+
+        // Clear any existing event listeners
+        confirmBtn.replaceWith(confirmBtn.cloneNode(true));
+        cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+
+        // Get the new button references
+        const newConfirmBtn = document.getElementById('modal-confirm-btn');
+        const newCancelBtn = document.getElementById('modal-cancel-btn');
+
+        // Add new event listeners
+        newConfirmBtn.addEventListener('click', handleConfirm);
+        newCancelBtn.addEventListener('click', handleCancel);
+
+        // Close on ESC key
+        const handleEsc = (e) => {
+            if (e.key === 'Escape') {
+                handleCancel();
+                document.removeEventListener('keydown', handleEsc);
+            }
+        };
+        document.addEventListener('keydown', handleEsc);
+    }
+
+    hideModal() {
+        const modalOverlay = document.getElementById('modal-overlay');
+        const modalContainer = modalOverlay.querySelector('.modal-container');
+
+        // Add exit animation
+        modalContainer.style.transform = 'translateY(20px)';
+
+        // Wait for animation before hiding
+        setTimeout(() => {
+            modalOverlay.classList.add('hidden');
+            modalContainer.style.transform = 'translateY(0)';
+        }, 200);
+    }
+
 }
 
 export default NotesView;

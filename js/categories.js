@@ -1,5 +1,7 @@
 // File: js/categories.js - Utility for managing note categories
 
+import db from './db.js';
+
 class CategoriesManager {
     constructor() {
         this.defaultCategories = [
@@ -11,40 +13,70 @@ class CategoriesManager {
     }
 
     async loadCategories() {
-        return new Promise((resolve) => {
-            chrome.storage.local.get('categories', (result) => {
-                // If no categories exist, use the defaults
-                const categories = result.categories || this.defaultCategories;
-                resolve(categories);
-            });
-        });
+        try {
+            // Get all categories from database
+            const categories = await db.categories.toArray();
+
+            // If no categories exist, use the defaults (this shouldn't happen due to initialization)
+            if (categories.length === 0) {
+                await this.initializeDefaultCategories();
+                return this.defaultCategories;
+            }
+
+            return categories;
+        } catch (error) {
+            console.error('Error loading categories:', error);
+            return this.defaultCategories;
+        }
     }
 
-    async saveCategories(categories) {
-        return new Promise((resolve) => {
-            chrome.storage.local.set({ categories }, resolve);
-        });
+    async initializeDefaultCategories() {
+        try {
+            // Add default categories if none exist
+            await db.categories.bulkAdd(this.defaultCategories);
+        } catch (error) {
+            console.error('Error initializing default categories:', error);
+        }
     }
 
     // Create a new category
     async createCategory(name, color) {
-        const categories = await this.loadCategories();
         const newCategory = {
             id: name.toLowerCase().replace(/\s+/g, '-'),
             name,
             color
         };
-        
-        categories.push(newCategory);
-        await this.saveCategories(categories);
-        return newCategory;
+
+        try {
+            // Add to database
+            await db.categories.add(newCategory);
+            return newCategory;
+        } catch (error) {
+            console.error('Error creating category:', error);
+            return null;
+        }
     }
 
     // Delete a category
     async deleteCategory(categoryId) {
-        let categories = await this.loadCategories();
-        categories = categories.filter(cat => cat.id !== categoryId);
-        await this.saveCategories(categories);
+        try {
+            // Delete from database
+            await db.categories.delete(categoryId);
+
+            // Also update all notes that have this category
+            const notesWithCategory = await db.notes
+                .where('categories')
+                .equals(categoryId)
+                .toArray();
+
+            // Remove the category from each note
+            for (const note of notesWithCategory) {
+                note.categories = note.categories.filter(cat => cat !== categoryId);
+                await db.notes.update(note.id, { categories: note.categories });
+            }
+        } catch (error) {
+            console.error('Error deleting category:', error);
+        }
     }
 
     // Get all categories
@@ -54,8 +86,21 @@ class CategoriesManager {
 
     // Get a category by ID
     async getCategoryById(categoryId) {
-        const categories = await this.loadCategories();
-        return categories.find(cat => cat.id === categoryId) || null;
+        try {
+            return await db.categories.get(categoryId);
+        } catch (error) {
+            console.error('Error getting category by ID:', error);
+            return null;
+        }
+    }
+
+    // Update a category
+    async updateCategory(categoryId, updates) {
+        try {
+            await db.categories.update(categoryId, updates);
+        } catch (error) {
+            console.error('Error updating category:', error);
+        }
     }
 }
 

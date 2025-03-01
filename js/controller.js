@@ -76,10 +76,14 @@ class NotesController {
             }
         });
 
-        // Add category button (now in the header)
+        // In controller.js, update the setupEventListeners method
+
+        // Add category button
         if (this.view.addCategoryBtn) {
             this.view.addCategoryBtn.addEventListener('click', async (e) => {
-                e.stopPropagation();
+                e.preventDefault(); // Prevent default behavior
+                e.stopPropagation(); // Stop event propagation
+
                 const rect = e.target.closest('.icon-button').getBoundingClientRect();
                 const categories = await this.categoriesManager.getAllCategories();
 
@@ -89,8 +93,11 @@ class NotesController {
                     rect.bottom
                 );
 
-                // Handle category selection
-                dropdown.addEventListener('click', async (e) => {
+                // Handle category selection - Fix for first click not working
+                const handleCategoryClick = async (e) => {
+                    e.preventDefault(); // Prevent default
+                    e.stopPropagation(); // Stop propagation
+
                     const categoryOption = e.target.closest('.category-option');
                     const createOption = e.target.closest('.create-category-option');
 
@@ -98,9 +105,10 @@ class NotesController {
                         const categoryId = categoryOption.dataset.id;
                         const activeNote = this.model.getActiveNote();
                         if (activeNote) {
-                            this.model.addCategoryToNote(activeNote.id, categoryId);
+                            await this.model.addCategoryToNote(activeNote.id, categoryId);
                             dropdown.remove();
                             this.refreshView();
+                            document.removeEventListener('click', handleCategoryClick); // Clean up
                         }
                     } else if (createOption) {
                         dropdown.remove();
@@ -108,21 +116,35 @@ class NotesController {
                             window.innerWidth - rect.right,
                             rect.bottom
                         );
+                        document.removeEventListener('click', handleCategoryClick); // Clean up
                     }
+                };
+
+                // Use direct click handlers instead of event delegation
+                const categoryOptions = dropdown.querySelectorAll('.category-option');
+                categoryOptions.forEach(option => {
+                    option.addEventListener('click', handleCategoryClick);
                 });
+
+                const createOption = dropdown.querySelector('.create-category-option');
+                if (createOption) {
+                    createOption.addEventListener('click', handleCategoryClick);
+                }
             });
         }
 
-        // Remove category
+        // Remove category - Fix for remove (x) not working on first click
         if (this.view.categoriesContainer) {
-            this.view.categoriesContainer.addEventListener('click', (e) => {
+            this.view.categoriesContainer.addEventListener('click', async (e) => {
+                e.preventDefault(); // Prevent default
+
                 if (e.target.classList.contains('remove-category')) {
                     const badge = e.target.closest('.category-badge');
                     if (badge) {
                         const categoryId = badge.dataset.id;
                         const activeNote = this.model.getActiveNote();
                         if (activeNote) {
-                            this.model.removeCategoryFromNote(activeNote.id, categoryId);
+                            await this.model.removeCategoryFromNote(activeNote.id, categoryId);
                             this.refreshView();
                         }
                     }
@@ -156,10 +178,14 @@ class NotesController {
             dropdown.querySelector('#delete-note').addEventListener('click', () => {
                 const activeNote = this.model.getActiveNote();
                 if (activeNote) {
-                    if (confirm('Are you sure you want to delete this note?')) {
-                        this.model.deleteNote(activeNote.id);
-                        this.refreshView();
-                    }
+                    this.view.showModal(
+                        'Delete Note',
+                        `Are you sure you want to delete "${activeNote.title}"?`,
+                        async () => {
+                            await this.model.deleteNote(activeNote.id);
+                            this.refreshView();
+                        }
+                    );
                 }
                 dropdown.remove();
             });
