@@ -2,7 +2,7 @@
 
 import NotesModel from './model.js';
 import NotesView from './view.js';
-import NotesController from './controller.js';
+import NotesController from './controller/index.js';
 import CategoriesManager from './categories.js';
 import db from './db.js';
 
