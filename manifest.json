@@ -1,5 +1,4 @@
 {
-  "_comment": "Flash Notepad Chrome Extension manifest - Defines extension metadata, permissions, icons, and entry points",
   "manifest_version": 3,
   "name": "Flash Notepad",
   "version": "1.0",
