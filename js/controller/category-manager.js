@@ -363,7 +363,8 @@ class CategoryManager {
                     } catch (error) {
                         this.controller.showNotification(error.message, 'error');
                     }
-                }
+                },
+                'Delete' // Specify appropriate button text for deletion
             );
         } catch (error) {
             this.controller.showNotification(error.message, 'error');

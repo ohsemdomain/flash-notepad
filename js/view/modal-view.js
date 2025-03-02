@@ -18,10 +18,13 @@ class ModalView {
         this.cancelBtn = document.getElementById('modal-cancel-btn');
     }
 
-    showModal(title, message, onConfirm) {
+    showModal(title, message, onConfirm, confirmButtonText = 'Confirm') {
         // Set content
         this.modalTitle.textContent = title || 'Confirm Action';
         this.modalMessage.textContent = message || 'Are you sure you want to proceed?';
+        
+        // Set the confirm button text - this is the new line
+        this.confirmBtn.textContent = confirmButtonText;
 
         // Show modal with animation
         this.modalOverlay.classList.remove('hidden');

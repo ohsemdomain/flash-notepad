@@ -119,7 +119,8 @@ class BackupManager {
                         } catch (error) {
                             this.controller.showNotification(`Error during import: ${error.message}`, 'error');
                         }
-                    }
+                    },
+                    'Import' // Specify the button text appropriate for this action
                 );
             } catch (error) {
                 throw new Error(`Failed to parse text file: ${error.message}`);

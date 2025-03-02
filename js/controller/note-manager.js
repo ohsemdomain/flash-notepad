@@ -70,7 +70,8 @@ class NoteManager {
                     } catch (error) {
                         this.controller.showNotification(`Error deleting note: ${error.message}`, 'error');
                     }
-                }
+                },
+                'Delete' // Specify appropriate button text for deletion
             );
         }
         dropdown.remove();
