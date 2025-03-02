@@ -1,4 +1,13 @@
-// File: js/model/categories.js - Utility for managing note categories
+// js/model/categories.js
+/**
+ * @file js/model/categories.js
+ * @description Category management functionality
+ * @requires db.js
+ * 
+ * Provides a CategoriesManager class for creating, updating, and deleting note categories.
+ * Handles default categories, category lookups, and maintaining references between
+ * notes and categories.
+ */
 
 import db from '../db.js';
 

@@ -1,4 +1,11 @@
-// File: js/controller/ui-manager.js - Handles UI-related operations
+// js/controller/ui-manager.js
+/**
+ * @file js/controller/ui-manager.js
+ * @description Manages UI-related operations
+ * 
+ * Provides UI utilities like notifications and settings panel management.
+ * Handles general UI operations not specifically tied to notes or categories.
+ */
 
 class UIManager {
     constructor(controller) {

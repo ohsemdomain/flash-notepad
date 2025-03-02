@@ -1,4 +1,13 @@
-// File: js/controller/controller.js - Main controller that coordinates other modules
+// js/controller/controller.js
+/**
+ * @file js/controller/controller.js
+ * @description Main controller for the application
+ * @requires category-manager.js, note-manager.js, backup-manager.js, ui-manager.js
+ * 
+ * Central controller that coordinates between the model and view, and delegates
+ * specific functionalities to specialized controller components. Sets up event
+ * listeners and initializes the application.
+ */
 
 import CategoryManager from './category-manager.js';
 import NoteManager from './note-manager.js';

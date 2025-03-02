@@ -1,4 +1,11 @@
-// File: js/view/note-editor-view.js - Handles the note editor area
+// js/view/note-editor-view.js
+/**
+ * @file js/view/note-editor-view.js
+ * @description Note editor UI components
+ * 
+ * Manages the note editor interface, including title and content fields.
+ * Controls the state of editor elements based on active note selection.
+ */
 
 class NoteEditorView {
     constructor(titleElement, contentElement, optionsButtonElement) {

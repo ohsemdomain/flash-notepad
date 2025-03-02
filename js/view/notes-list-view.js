@@ -1,4 +1,11 @@
-// File: js/view/notes-list-view.js - Handles rendering the notes list
+// js/view/notes-list-view.js
+/**
+ * @file js/view/notes-list-view.js
+ * @description Notes list rendering
+ * 
+ * Handles the display of the notes list in the sidebar, including category
+ * indicators and selection state. Provides empty state handling when no notes exist.
+ */
 
 class NotesListView {
     constructor(notesListElement) {

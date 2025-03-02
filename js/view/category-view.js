@@ -1,4 +1,11 @@
-// File: js/view/category-view.js - Handles category-related UI
+// js/view/category-view.js
+/**
+ * @file js/view/category-view.js
+ * @description UI components for category management
+ * 
+ * Handles rendering of category badges, category selectors, and forms for
+ * creating new categories. Manages the UI components related to note categorization.
+ */
 
 class CategoryView {
     constructor(categoriesContainer, addCategoryBtn) {

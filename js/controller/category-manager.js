@@ -1,6 +1,15 @@
-// File: js/controller/category-manager.js - Handles category-related operations
+// js/controller/category-manager.js
+/**
+ * @file js/controller/category-manager.js
+ * @description Manages category-related operations
+ * @requires categories.js
+ * 
+ * Controller component that handles category creation, editing, deletion, and
+ * assignment to notes. Manages UI interactions for category management in both
+ * the note editor and settings panels.
+ */
 
-import CategoriesManager from '../categories.js';
+import CategoriesManager from '../model/categories.js';
 
 class CategoryManager {
     constructor(controller) {
@@ -13,13 +22,13 @@ class CategoryManager {
 
     async loadCategories() {
         const categories = await this.categoriesManager.getAllCategories();
-        
+
         // Create a map for quick lookups
         this.categoriesMap.clear();
         categories.forEach(category => {
             this.categoriesMap.set(category.id, category);
         });
-        
+
         return categories;
     }
 

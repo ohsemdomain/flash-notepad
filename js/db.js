@@ -1,4 +1,12 @@
-// File: js/db.js - Dexie database setup for Flash Notepad
+// js/db.js
+/**
+ * @file js/db.js
+ * @description Database configuration for Flash Notepad using Dexie.js
+ * @requires Dexie
+ * 
+ * Sets up the IndexedDB database schema and structure with tables for notes and categories.
+ * Handles initialization of default categories when the database is first created.
+ */
 
 class NotepadDatabase extends Dexie {
     constructor() {

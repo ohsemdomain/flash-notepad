@@ -1,4 +1,13 @@
-// File: js/view/view.js - Main view coordinator that delegates to specialized views
+// js/view/view.js
+/**
+ * @file js/view/view.js
+ * @description Main view coordinator
+ * @requires notes-list-view.js, note-editor-view.js, category-view.js, dropdown-view.js, modal-view.js
+ * 
+ * Central view class that coordinates all UI components and delegates rendering
+ * tasks to specialized view modules. Acts as a facade for the controller to
+ * interact with all view-related functionality.
+ */
 
 import NotesListView from './notes-list-view.js';
 import NoteEditorView from './note-editor-view.js';

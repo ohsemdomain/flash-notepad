@@ -1,12 +1,17 @@
-// File: js/backup-utils.js - Utilities for backup and import
-
+// js/model/backup-utils.js
 /**
- * Converts notes to plain text format for backup
+ * @file js/backup-utils.js
+ * @description Utilities for export and import of notes
+ * 
+ * Provides functions to convert notes to and from plain text format for backup
+ * and restoration purposes. Handles formatting with metadata and content sections
+ * for each note, including categories references.
  * 
  * @param {Array} notes Array of note objects
  * @param {Map} categoriesMap Map of categories for lookup
  * @returns {string} Formatted plain text
  */
+
 export function convertNotesToPlainText(notes, categoriesMap) {
     let textContent = `FLASH NOTEPAD BACKUP - ${new Date().toISOString()}\n\n`;
 

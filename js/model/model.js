@@ -1,4 +1,12 @@
-// File: js/model/model.js - Handles data management for the notepad extension
+// js/model/model.js
+/**
+ * @file js/model/model.js
+ * @description Data model for the notepad extension
+ * @requires db.js
+ * 
+ * Core data model that handles loading, creating, updating, and deleting notes.
+ * Maintains the active note state and provides methods for filtering and searching notes.
+ */
 
 import db from '../db.js';
 

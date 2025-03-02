@@ -1,4 +1,12 @@
-// File: js/view/dropdown-view.js - Handles dropdown menus
+// js/view/dropdown-view.js
+/**
+ * @file js/view/dropdown-view.js
+ * @description Dropdown menu components
+ * 
+ * Creates and manages dropdown menus for various purposes including
+ * note options and category selection. Provides general-purpose dropdown
+ * creation functionality.
+ */
 
 class DropdownView {
     constructor() {

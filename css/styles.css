@@ -1,4 +1,11 @@
-/* File: css/styles.css - Custom styles for the notepad extension */
+/* 
+ * File: css/styles.css
+ * Description: Custom styles for the Flash Notepad extension
+ * 
+ * Defines the visual appearance of the application including layout, colors,
+ * typography, and animations. Contains styles for all UI components including
+ * sidebar, note editor, modals, and form elements.
+ */
 
 /* Global styles */
 :root {

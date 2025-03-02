@@ -1,6 +1,14 @@
-// File: js/controller/backup-manager.js - Handles import/export functionality
+// js/controller/backup-manager.js
+/**
+ * @file js/controller/backup-manager.js
+ * @description Handles import/export functionality
+ * @requires backup-utils.js
+ * 
+ * Manages the backup and restoration of notes, including exporting to plain text
+ * and importing from files. Handles file selection, parsing, and confirmation dialogs.
+ */
 
-import { convertNotesToPlainText, parseTextNotes } from '../backup-utils.js';
+import { convertNotesToPlainText, parseTextNotes } from '../model/backup-utils.js';
 
 class BackupManager {
     constructor(controller) {

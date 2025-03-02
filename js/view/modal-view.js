@@ -1,4 +1,11 @@
-// File: js/view/modal-view.js - Handles modal dialogs
+// js/view/modal-view.js
+/**
+ * @file js/view/modal-view.js
+ * @description Modal dialog management
+ * 
+ * Handles the display and interaction with modal dialogs for confirmations,
+ * alerts, and form inputs. Includes animation and keyboard navigation support.
+ */
 
 class ModalView {
     constructor() {

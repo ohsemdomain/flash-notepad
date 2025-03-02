@@ -1,4 +1,12 @@
-// File: js/app.js - Application entry point
+// js/app.js
+/**
+ * @file js/app.js
+ * @description Application entry point
+ * @requires model.js, view.js, controller.js, db.js
+ * 
+ * Initializes the application by creating instances of the model, view, and
+ * controller components. Sets up error handling for database connection issues.
+ */
 
 import NotesModel from './model/model.js';
 import NotesView from './view/view.js';
