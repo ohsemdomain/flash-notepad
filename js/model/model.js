@@ -1,6 +1,6 @@
-// File: js/model.js - Handles data management for the notepad extension
+// File: js/model/model.js - Handles data management for the notepad extension
 
-import db from './db.js';
+import db from '../db.js';
 
 class NotesModel {
     constructor() {

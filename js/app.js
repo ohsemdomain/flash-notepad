@@ -1,9 +1,8 @@
 // File: js/app.js - Application entry point
 
-import NotesModel from './model.js';
-import NotesView from './view.js';
-import NotesController from './controller/index.js';
-import CategoriesManager from './categories.js';
+import NotesModel from './model/model.js';
+import NotesView from './view/view.js';
+import NotesController from './controller/controller.js';
 import db from './db.js';
 
 // Initialize the application

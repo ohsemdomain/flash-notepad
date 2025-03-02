@@ -1,6 +1,6 @@
-// File: js/categories.js - Utility for managing note categories
+// File: js/model/categories.js - Utility for managing note categories
 
-import db from './db.js';
+import db from '../db.js';
 
 class CategoriesManager {
     constructor() {
