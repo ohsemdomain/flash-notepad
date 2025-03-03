@@ -46,26 +46,36 @@ export function convertNotesToPlainText(notes, categoriesMap) {
  * @param {Array} existingCategories Array of category objects for resolving by name
  * @returns {Array} Array of parsed note objects
  */
+
 export function parseTextNotes(content, existingCategories) {
     const notes = [];
     const noteBlocks = content.split('--- NOTE START ---');
-    const categoryCache = {}; // For tracking created categories during import
+    const categoryCache = {}; // For tracking categories during import
+    const newCategories = []; // Track new categories that need to be created
 
     // Helper function to find or create a category
     const findOrCreateCategory = (name, color = '#4285F4') => {
         // First check cache
-        if (categoryCache[name]) return categoryCache[name];
+        if (categoryCache[name]) return categoryCache[name].id;
 
         // Then check existing categories
         const existingCat = existingCategories.find(c => c.name.toLowerCase() === name.toLowerCase());
         if (existingCat) {
-            categoryCache[name] = existingCat.id;
+            categoryCache[name] = { id: existingCat.id, isNew: false };
             return existingCat.id;
         }
 
-        // Not found - this would require creating a new category
-        // This would be handled separately during the import process
-        return null;
+        // Not found - create a new temporary category entry
+        const tempId = `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const newCategory = {
+            tempId: tempId,
+            name: name,
+            color: color
+        };
+
+        newCategories.push(newCategory);
+        categoryCache[name] = { id: tempId, isNew: true };
+        return tempId;
     };
 
     for (let i = 1; i < noteBlocks.length; i++) { // Start from 1 to skip header
@@ -113,5 +123,5 @@ export function parseTextNotes(content, existingCategories) {
         }
     }
 
-    return notes;
+    return { notes, newCategories };
 }

@@ -85,16 +85,22 @@ class BackupManager {
                 const existingCategories = await this.controller.categoryManager.categoriesManager.getAllCategories();
 
                 // Parse notes from the content
-                const notes = parseTextNotes(content, existingCategories);
+                const { notes, newCategories } = parseTextNotes(content, existingCategories);
 
                 if (notes.length === 0) {
                     throw new Error('No valid notes found in the imported file');
                 }
 
                 // Confirm before replacing all notes
+                let confirmMessage = `This will import ${notes.length} note(s) and replace all existing notes.`;
+                if (newCategories.length > 0) {
+                    confirmMessage += ` ${newCategories.length} new categories will also be created.`;
+                }
+                confirmMessage += " Continue?";
+
                 this.view.showModal(
                     'Import Notes',
-                    `This will import ${notes.length} note(s) and replace all existing notes. Continue?`,
+                    confirmMessage,
                     async () => {
                         try {
                             // Delete all existing notes
@@ -103,19 +109,46 @@ class BackupManager {
                                 await this.model.deleteNote(note.id);
                             }
 
-                            // Import each note
+                            // First create any new categories and build a mapping
+                            const categoryIdMap = {};
+                            for (const newCat of newCategories) {
+                                try {
+                                    const createdCategory = await this.controller.categoryManager.categoriesManager.createCategory(
+                                        newCat.name,
+                                        newCat.color
+                                    );
+                                    categoryIdMap[newCat.tempId] = createdCategory.id;
+                                } catch (error) {
+                                    console.error(`Failed to create category ${newCat.name}:`, error);
+                                }
+                            }
+
+                            // Import each note, replacing temp IDs with actual category IDs
                             for (const note of notes) {
                                 // Create a new note with the imported data
                                 const newNote = await this.model.createNote();
+
+                                // Map any temporary category IDs to actual IDs
+                                const mappedCategories = (note.categories || []).map(catId =>
+                                    categoryIdMap[catId] || catId
+                                );
+
                                 await this.model.updateNote(newNote.id, {
                                     title: note.title,
                                     content: note.content,
-                                    categories: note.categories || []
+                                    categories: mappedCategories
                                 });
                             }
 
+                            // Reload categories and refresh view
+                            await this.controller.categoryManager.loadCategories();
                             this.controller.refreshView();
-                            this.controller.showNotification(`Successfully imported ${notes.length} notes`, 'success');
+
+                            let successMsg = `Successfully imported ${notes.length} notes`;
+                            if (newCategories.length > 0) {
+                                successMsg += ` and ${newCategories.length} categories`;
+                            }
+                            this.controller.showNotification(successMsg, 'success');
                         } catch (error) {
                             this.controller.showNotification(`Error during import: ${error.message}`, 'error');
                         }
