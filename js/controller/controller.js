@@ -131,9 +131,9 @@ class NotesController {
             });
         });
 
-        // Export notes (Plain Text)
-        document.getElementById('export-text-btn').addEventListener('click', () => {
-            this.backupManager.exportNotes('text');
+        // Export notes
+        document.getElementById('export-notes-btn').addEventListener('click', () => {
+            this.backupManager.exportNotes();
         });
 
         // Import notes

@@ -118,22 +118,22 @@
                 <div class="settings-tab-content">
                     <!-- Backup & Import Tab -->
                     <div class="tab-pane active" id="backup-tab">
-                        <h3>Backup Options</h3>
+                        <h3>Backup</h3>
                         <div class="setting-group">
-                            <button id="export-text-btn" class="btn btn-primary">
-                                <i class="fas fa-file-alt"></i> Export as Plain Text
+                            <button id="export-notes-btn" class="btn btn-primary">
+                                <i class="fas fa-file-export"></i> Export All Notes
                             </button>
-                            <p class="setting-description">Export all notes as a single plain text file</p>
+                            <p class="setting-description">Export all notes and categories as a JSON file</p>
                         </div>
 
-                        <h3>Import Options</h3>
+                        <h3>Import</h3>
                         <div class="setting-group">
                             <button id="import-notes-btn" class="btn btn-primary">
                                 <i class="fas fa-upload"></i> Import Notes
                             </button>
-                            <p class="setting-description">Import notes from a text file (replaces all existing notes)
+                            <p class="setting-description">Import notes from a JSON file (replaces all existing notes)
                             </p>
-                            <input type="file" id="import-file-input" accept=".txt" style="display: none;">
+                            <input type="file" id="import-file-input" accept=".json" style="display: none;">
                         </div>
                     </div>
 

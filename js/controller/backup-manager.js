@@ -4,11 +4,11 @@
  * @description Handles import/export functionality
  * @requires backup-utils.js
  * 
- * Manages the backup and restoration of notes, including exporting to plain text
- * and importing from files. Handles file selection, parsing, and confirmation dialogs.
+ * Manages the backup and restoration of notes using JSON format.
+ * Handles file selection, parsing, and confirmation dialogs.
  */
 
-import { convertNotesToPlainText, parseTextNotes } from '../model/backup-utils.js';
+import { prepareExportData, validateImportData } from '../model/backup-utils.js';
 
 class BackupManager {
     constructor(controller) {
@@ -17,175 +17,167 @@ class BackupManager {
         this.view = controller.view;
     }
 
-    // Export notes as text
-    async exportNotes(format = 'text') {
-        try {
-            const notes = this.model.getAllNotes();
-            if (notes.length === 0) {
-                this.controller.showNotification('No notes to export', 'warning');
-                return;
-            }
-
-            // Show loading indicator for large exports
-            if (notes.length > 100) {
-                this.controller.showNotification('Preparing export...', 'info');
-            }
-
-            let fileContent;
-            let fileName;
-            let mimeType;
-
-            // Export as plain text
-            fileContent = await convertNotesToPlainText(
-                notes,
-                this.controller.categoryManager.categoriesMap
-            );
-
-            // Generate a more descriptive filename
-            fileName = `flash-notepad-${notes.length}-notes-${new Date().toISOString().split('T')[0]}.txt`;
-            mimeType = 'text/plain';
-
-            const blob = new Blob([fileContent], { type: mimeType });
-            const url = URL.createObjectURL(blob);
-
-            // Create download link
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = fileName;
-            a.click();
-
-            // Clean up
-            URL.revokeObjectURL(url);
-
-            this.controller.showNotification(`${notes.length} notes exported successfully`, 'success');
-        } catch (error) {
-            console.error('Export error:', error);
-            this.controller.showNotification(`Export failed: ${error.message}`, 'error');
+    // Export notes as JSON
+    exportNotes() {
+        const notes = this.model.getAllNotes();
+        if (notes.length === 0) {
+            this.controller.showNotification('No notes to export', 'warning');
+            return;
         }
+
+        // Prepare data for JSON export using the utility function
+        const exportData = prepareExportData(
+            notes,
+            this.controller.categoryManager.categoriesMap
+        );
+
+        // Convert to JSON
+        const fileContent = JSON.stringify(exportData, null, 2); // Pretty print with 2 spaces
+        const fileName = `flash-notepad-${new Date().toISOString().split('T')[0]}.json`;
+        const mimeType = 'application/json';
+
+        // Create download
+        const blob = new Blob([fileContent], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+
+        // Create download link
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        a.click();
+
+        // Clean up
+        URL.revokeObjectURL(url);
+
+        this.controller.showNotification('Notes exported successfully', 'success');
     }
 
     // Handle file import from input event
     handleFileImport(e) {
-        if (!e.target.files || e.target.files.length === 0) {
-            return;
-        }
+        if (e.target.files.length > 0) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
 
-        const file = e.target.files[0];
-
-        if (!file.name.endsWith('.txt')) {
-            this.controller.showNotification('Please select a .txt file', 'error');
-            e.target.value = '';
-            return;
-        }
-
-        // Check file size - warn for large files
-        if (file.size > 5 * 1024 * 1024) { // 5MB
-            this.controller.showNotification('Large file detected, import may take a moment', 'info');
-        }
-
-        const reader = new FileReader();
-
-        reader.onload = async (event) => {
-            try {
+            reader.onload = async (event) => {
                 const content = event.target.result;
-                await this.importNotes(file, content);
-                // Reset the file input
-                e.target.value = '';
-            } catch (error) {
-                this.controller.showNotification(`Error importing notes: ${error.message}`, 'error');
-                e.target.value = '';
+                try {
+                    await this.importNotes(file, content);
+                    // Reset the file input
+                    e.target.value = '';
+                } catch (error) {
+                    this.controller.showNotification(`Error importing notes: ${error.message}`, 'error');
+                }
+            };
+
+            if (file.name.endsWith('.json')) {
+                reader.readAsText(file);
+            } else {
+                this.controller.showNotification('Please select a .json file', 'error');
             }
-        };
-
-        reader.onerror = () => {
-            this.controller.showNotification('Failed to read file', 'error');
-            e.target.value = '';
-        };
-
-        reader.readAsText(file);
+        }
     }
 
     // Import notes from file
     async importNotes(file, content) {
-        try {
-            // Get existing categories for resolving during import
-            const existingCategories = await this.controller.categoryManager.categoriesManager.getAllCategories();
+        if (file.name.endsWith('.json')) {
+            try {
+                // Parse the JSON content
+                const importData = JSON.parse(content);
 
-            // Parse notes from the content
-            const { notes, newCategories } = parseTextNotes(content, existingCategories);
+                // Validate the imported data using the utility function
+                const validation = validateImportData(importData);
 
-            if (notes.length === 0) {
-                throw new Error('No valid notes found in the imported file');
-            }
+                if (!validation.valid) {
+                    throw new Error(validation.message);
+                }
 
-            // Confirm before replacing all notes
-            let confirmMessage = `This will import ${notes.length} note(s) and replace all existing notes.`;
-            if (newCategories.length > 0) {
-                confirmMessage += ` ${newCategories.length} new categories will also be created.`;
-            }
-            confirmMessage += " Continue?";
+                const notes = importData.notes;
+                const categories = importData.categories || [];
 
-            this.view.showModal(
-                'Import Notes',
-                confirmMessage,
-                async () => {
-                    try {
-                        this.controller.showNotification('Import in progress...', 'info');
+                // Confirm before replacing all notes
+                let confirmMessage = `This will import ${validation.noteCount} note(s) and replace all existing notes.`;
+                if (validation.categoryCount > 0) {
+                    confirmMessage += ` ${validation.categoryCount} categories will also be imported.`;
+                }
+                confirmMessage += " Continue?";
 
-                        // Delete all existing notes
-                        const existingNotes = this.model.getAllNotes();
-                        for (const note of existingNotes) {
-                            await this.model.deleteNote(note.id);
-                        }
-
-                        // First create any new categories and build a mapping
-                        const categoryIdMap = {};
-                        for (const newCat of newCategories) {
-                            try {
-                                const createdCategory = await this.controller.categoryManager.categoriesManager.createCategory(
-                                    newCat.name,
-                                    newCat.color
-                                );
-                                categoryIdMap[newCat.tempId] = createdCategory.id;
-                            } catch (error) {
-                                console.error(`Failed to create category ${newCat.name}:`, error);
+                this.view.showModal(
+                    'Import Notes',
+                    confirmMessage,
+                    async () => {
+                        try {
+                            // Delete all existing notes
+                            const existingNotes = this.model.getAllNotes();
+                            for (const note of existingNotes) {
+                                await this.model.deleteNote(note.id);
                             }
+
+                            // First import categories and build a mapping
+                            const categoryIdMap = {};
+
+                            // Delete existing categories if we have new ones to import
+                            if (categories.length > 0) {
+                                const existingCategories = await this.controller.categoryManager.categoriesManager.getAllCategories();
+                                for (const cat of existingCategories) {
+                                    try {
+                                        await this.controller.categoryManager.categoriesManager.deleteCategory(cat.id);
+                                    } catch (error) {
+                                        console.error(`Failed to delete category ${cat.name}:`, error);
+                                    }
+                                }
+
+                                // Import new categories
+                                for (const category of categories) {
+                                    try {
+                                        const newId = category.id;
+                                        const createdCategory = await this.controller.categoryManager.categoriesManager.createCategory(
+                                            category.name,
+                                            category.color
+                                        );
+                                        categoryIdMap[newId] = createdCategory.id;
+                                    } catch (error) {
+                                        console.error(`Failed to create category ${category.name}:`, error);
+                                    }
+                                }
+                            }
+
+                            // Import each note
+                            for (const note of notes) {
+                                // Create a new note
+                                const newNote = await this.model.createNote();
+
+                                // Map any category IDs if needed
+                                const mappedCategories = (note.categories || []).map(catId =>
+                                    categoryIdMap[catId] || catId
+                                );
+
+                                await this.model.updateNote(newNote.id, {
+                                    title: note.title,
+                                    content: note.content,
+                                    categories: mappedCategories
+                                });
+                            }
+
+                            // Reload categories and refresh view
+                            await this.controller.categoryManager.loadCategories();
+                            this.controller.refreshView();
+
+                            let successMsg = `Successfully imported ${notes.length} notes`;
+                            if (categories.length > 0) {
+                                successMsg += ` and ${categories.length} categories`;
+                            }
+                            this.controller.showNotification(successMsg, 'success');
+                        } catch (error) {
+                            this.controller.showNotification(`Error during import: ${error.message}`, 'error');
                         }
-
-                        // Import each note, replacing temp IDs with actual category IDs
-                        for (const note of notes) {
-                            // Create a new note with the imported data
-                            const newNote = await this.model.createNote();
-
-                            // Map any temporary category IDs to actual IDs
-                            const mappedCategories = (note.categories || []).map(catId =>
-                                categoryIdMap[catId] || catId
-                            );
-
-                            await this.model.updateNote(newNote.id, {
-                                title: note.title,
-                                content: note.content,
-                                categories: mappedCategories
-                            });
-                        }
-
-                        // Reload categories and refresh view
-                        await this.controller.categoryManager.loadCategories();
-                        this.controller.refreshView();
-
-                        let successMsg = `Successfully imported ${notes.length} notes`;
-                        if (newCategories.length > 0) {
-                            successMsg += ` and ${newCategories.length} categories`;
-                        }
-                        this.controller.showNotification(successMsg, 'success');
-                    } catch (error) {
-                        this.controller.showNotification(`Error during import: ${error.message}`, 'error');
-                    }
-                },
-                'Import' // Specify the button text appropriate for this action
-            );
-        } catch (error) {
-            throw new Error(`Failed to parse text file: ${error.message}`);
+                    },
+                    'Import' // Specify the button text appropriate for this action
+                );
+            } catch (error) {
+                throw new Error(`Failed to parse JSON file: ${error.message}`);
+            }
+        } else {
+            throw new Error('Unsupported file format. Please use .json files.');
         }
     }
 }
