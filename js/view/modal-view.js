@@ -22,9 +22,17 @@ class ModalView {
         // Set content
         this.modalTitle.textContent = title || 'Confirm Action';
         this.modalMessage.textContent = message || 'Are you sure you want to proceed?';
-        
-        // Set the confirm button text - this is the new line
+
+        // Set the confirm button text
         this.confirmBtn.textContent = confirmButtonText;
+
+        // Check if settings modal is open and apply higher z-index if needed
+        const settingsModalOpen = !document.getElementById('settings-modal').classList.contains('hidden');
+        if (settingsModalOpen) {
+            this.modalOverlay.classList.add('modal-overlay-top');
+        } else {
+            this.modalOverlay.classList.remove('modal-overlay-top');
+        }
 
         // Show modal with animation
         this.modalOverlay.classList.remove('hidden');
@@ -78,6 +86,7 @@ class ModalView {
         // Wait for animation before hiding
         setTimeout(() => {
             this.modalOverlay.classList.add('hidden');
+            this.modalOverlay.classList.remove('modal-overlay-top');
             this.modalContainer.style.transform = 'translateY(0)';
         }, 200);
     }

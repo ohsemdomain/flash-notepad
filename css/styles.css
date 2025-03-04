@@ -374,6 +374,11 @@ body {
     transition: all 0.2s ease-in-out;
 }
 
+/* Modal stacking fix */
+.modal-overlay-top {
+    z-index: 1001;
+}
+
 .hidden {
     display: none;
     opacity: 0;
