@@ -95,14 +95,14 @@ class BackupManager {
                 const categories = importData.categories || [];
 
                 // Confirm before replacing all notes
-                let confirmMessage = `This will import ${validation.noteCount} note(s) and replace all existing notes.`;
+                let confirmMessage = `Import backup file that contain ${validation.noteCount} note(s) and`;
                 if (validation.categoryCount > 0) {
-                    confirmMessage += ` ${validation.categoryCount} categories will also be imported.`;
+                    confirmMessage += ` ${validation.categoryCount} category(s). This action will replace all existing notes.`;
                 }
                 confirmMessage += " Continue?";
 
                 this.view.showModal(
-                    'Import Notes',
+                    'Import Backup File',
                     confirmMessage,
                     async () => {
                         try {

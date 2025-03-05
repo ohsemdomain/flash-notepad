@@ -109,7 +109,7 @@
             <div class="settings-content">
                 <!-- Tabs -->
                 <div class="settings-tabs">
-                    <button class="settings-tab active" data-tab="backup">Backup & Import</button>
+                    <button class="settings-tab active" data-tab="backup">Backup</button>
                     <button class="settings-tab" data-tab="appearance">Appearance</button>
                     <button class="settings-tab" data-tab="categories">Categories</button>
                 </div>
@@ -118,20 +118,20 @@
                 <div class="settings-tab-content">
                     <!-- Backup & Import Tab -->
                     <div class="tab-pane active" id="backup-tab">
-                        <h3>Backup</h3>
+                        <h3>Export</h3>
+                        <p class="setting-description">Export all notes and categories as a backup file</p>
                         <div class="setting-group">
                             <button id="export-notes-btn" class="btn btn-primary">
-                                <i class="fas fa-file-export"></i> Export All Notes
+                                <i class="fas fa-file-export"></i> Export Backup File
                             </button>
-                            <p class="setting-description">Export all notes and categories as a JSON file</p>
                         </div>
 
                         <h3>Import</h3>
+                        <p class="setting-description">Import all notes and categories from backup file</p>
                         <div class="setting-group">
                             <button id="import-notes-btn" class="btn btn-primary">
-                                <i class="fas fa-upload"></i> Import Notes
+                                <i class="fas fa-upload"></i> Import Backup File
                             </button>
-                            <p class="setting-description">Import notes from a JSON file (replaces all existing notes)
                             </p>
                             <input type="file" id="import-file-input" accept=".json" style="display: none;">
                         </div>

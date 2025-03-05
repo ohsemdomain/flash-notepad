@@ -499,6 +499,7 @@ body {
 
 .setting-description {
     margin-top: 8px;
+    margin-bottom: 8px;
     font-size: 12px;
     color: var(--color-text-light);
 }
