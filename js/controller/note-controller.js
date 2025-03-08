@@ -1,13 +1,13 @@
-// js/controller/note-manager.js
+// js/controller/note-controller.js
 /**
- * @file js/controller/note-manager.js
+ * @file js/controller/note-controller.js
  * @description Handles note-related operations
  * 
  * Manages note creation, updating, and deletion. Handles UI interactions
  * specific to note management, including note options and confirmation dialogs.
  */
 
-class NoteManager {
+class NoteController {
     constructor(controller) {
         this.controller = controller;
         this.model = controller.model;
@@ -78,4 +78,4 @@ class NoteManager {
     }
 }
 
-export default NoteManager;
+export default NoteController;

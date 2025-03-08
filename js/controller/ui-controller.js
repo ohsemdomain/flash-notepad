@@ -1,13 +1,13 @@
-// js/controller/ui-manager.js
+// js/controller/ui-controller.js
 /**
- * @file js/controller/ui-manager.js
+ * @file js/controller/ui-controller.js
  * @description Manages UI-related operations
  * 
  * Provides UI utilities like notifications and settings panel management.
  * Handles general UI operations not specifically tied to notes or categories.
  */
 
-class UIManager {
+class UIController {
     constructor(controller) {
         this.controller = controller;
         this.model = controller.model;
@@ -53,4 +53,4 @@ class UIManager {
     }
 }
 
-export default UIManager;
+export default UIController;

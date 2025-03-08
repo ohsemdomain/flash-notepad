@@ -2,28 +2,28 @@
 /**
  * @file js/controller/controller.js
  * @description Main controller for the application
- * @requires category-manager.js, note-manager.js, backup-manager.js, ui-manager.js
+ * @requires category-controller.js, note-controller.js, backup-controller.js, ui-controller.js
  * 
  * Central controller that coordinates between the model and view, and delegates
  * specific functionalities to specialized controller components. Sets up event
  * listeners and initializes the application.
  */
 
-import CategoryManager from './category-manager.js';
-import NoteManager from './note-manager.js';
-import BackupManager from './backup-manager.js';
-import UIManager from './ui-manager.js';
+import CategoryController from './category-controller.js';
+import NoteController from './note-controller.js';
+import BackupController from './backup-controller.js';
+import UIController from './ui-controller.js';
 
-class NotesController {
+class AppController {
     constructor(model, view) {
         this.model = model;
         this.view = view;
 
-        // Initialize sub-managers
-        this.categoryManager = new CategoryManager(this);
-        this.noteManager = new NoteManager(this);
-        this.backupManager = new BackupManager(this);
-        this.uiManager = new UIManager(this);
+        // Initialize sub-controllers
+        this.categoryController = new CategoryController(this);
+        this.noteController = new NoteController(this);
+        this.backupController = new BackupController(this);
+        this.uiController = new UIController(this);
 
         // Initialize
         this.init();
@@ -31,7 +31,7 @@ class NotesController {
 
     async init() {
         await this.model.init();
-        await this.categoryManager.loadCategories();
+        await this.categoryController.loadCategories();
         this.refreshView();
         this.setupEventListeners();
     }
@@ -40,7 +40,7 @@ class NotesController {
         this.view.renderNotesList(
             this.model.getAllNotes(),
             this.model.activeNoteId,
-            this.categoryManager.categoriesMap
+            this.categoryController.categoriesMap
         );
         this.view.renderActiveNote(this.model.getActiveNote());
 
@@ -48,7 +48,7 @@ class NotesController {
         if (activeNote && this.view.categoriesContainer) {
             this.view.renderNoteCategories(
                 activeNote.categories || [],
-                Array.from(this.categoryManager.categoriesMap.values())
+                Array.from(this.categoryController.categoriesMap.values())
             );
         }
     }
@@ -56,7 +56,7 @@ class NotesController {
     setupEventListeners() {
         // Add new note
         this.view.addNoteBtn.addEventListener('click', () => {
-            this.noteManager.createNote();
+            this.noteController.createNote();
         });
 
         // Select note
@@ -70,31 +70,31 @@ class NotesController {
 
         // Update note title
         this.view.noteTitle.addEventListener('input', (e) => {
-            this.noteManager.updateNoteTitle(e.target.value);
+            this.noteController.updateNoteTitle(e.target.value);
         });
 
         // Update note content
         this.view.noteContent.addEventListener('input', (e) => {
-            this.noteManager.updateNoteContent(e.target.value);
+            this.noteController.updateNoteContent(e.target.value);
         });
 
         // Add category button
         if (this.view.addCategoryBtn) {
             this.view.addCategoryBtn.addEventListener('click', (e) => {
-                this.categoryManager.handleAddCategoryClick(e);
+                this.categoryController.handleAddCategoryClick(e);
             });
         }
 
         // Remove category
         if (this.view.categoriesContainer) {
             this.view.categoriesContainer.addEventListener('click', (e) => {
-                this.categoryManager.handleRemoveCategoryClick(e);
+                this.categoryController.handleRemoveCategoryClick(e);
             });
         }
 
         // Open settings
         this.view.settingsBtn.addEventListener('click', () => {
-            this.uiManager.openSettings();
+            this.uiController.openSettings();
         });
 
         // Open in new tab
@@ -104,7 +104,7 @@ class NotesController {
 
         // Note options dropdown
         this.view.noteOptionsBtn.addEventListener('click', (e) => {
-            this.noteManager.showNoteOptions(e);
+            this.noteController.showNoteOptions(e);
         });
 
         // Settings modal event listeners
@@ -133,7 +133,7 @@ class NotesController {
 
         // Export notes
         document.getElementById('export-notes-btn').addEventListener('click', () => {
-            this.backupManager.exportNotes();
+            this.backupController.exportNotes();
         });
 
         // Import notes
@@ -143,19 +143,19 @@ class NotesController {
 
         // Handle file import
         document.getElementById('import-file-input').addEventListener('change', (e) => {
-            this.backupManager.handleFileImport(e);
+            this.backupController.handleFileImport(e);
         });
 
         // Category management in settings
         document.getElementById('add-category-settings-btn').addEventListener('click', () => {
-            this.categoryManager.showCreateCategoryInSettings();
+            this.categoryController.showCreateCategoryInSettings();
         });
     }
 
-    // Helper method to show notification (delegated to UIManager)
+    // Helper method to show notification (delegated to UIController)
     showNotification(message, type = 'info') {
-        this.uiManager.showNotification(message, type);
+        this.uiController.showNotification(message, type);
     }
 }
 
-export default NotesController;
+export default AppController;

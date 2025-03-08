@@ -1,6 +1,6 @@
-// js/controller/category-manager.js
+// js/controller/category-controller.js
 /**
- * @file js/controller/category-manager.js
+ * @file js/controller/category-controller.js
  * @description Manages category-related operations
  * @requires categories.js
  * 
@@ -11,7 +11,7 @@
 
 import CategoriesManager from '../model/categories.js';
 
-class CategoryManager {
+class CategoryController {
     constructor(controller) {
         this.controller = controller;
         this.model = controller.model;
@@ -441,4 +441,4 @@ class CategoryManager {
     }
 }
 
-export default CategoryManager;
+export default CategoryController;

@@ -1,6 +1,6 @@
-// js/controller/backup-manager.js
+// js/controller/backup-controller.js
 /**
- * @file js/controller/backup-manager.js
+ * @file js/controller/backup-controller.js
  * @description Handles import/export functionality
  * @requires backup-utils.js
  * 
@@ -10,7 +10,7 @@
 
 import { prepareExportData, validateImportData } from '../model/backup-utils.js';
 
-class BackupManager {
+class BackupController {
     constructor(controller) {
         this.controller = controller;
         this.model = controller.model;
@@ -182,4 +182,4 @@ class BackupManager {
     }
 }
 
-export default BackupManager;
+export default BackupController;
